@@ -32,8 +32,3 @@ def get_book(conn: sqlite3.Connection, book_id: int) -> dict | None:
 
 def list_books(conn: sqlite3.Connection) -> list[dict]:
     return [dict(r) for r in conn.execute("SELECT * FROM books ORDER BY title")]
-
-
-def search_books(conn: sqlite3.Connection, query: str) -> list[dict]:
-    sql = f"SELECT * FROM books WHERE title LIKE '%{query}%' OR author LIKE '%{query}%'"
-    return [dict(r) for r in conn.execute(sql)]
