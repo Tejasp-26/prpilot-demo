@@ -1,6 +1,6 @@
 from flask import Flask, abort, jsonify, request
 
-from bookstore import db, reports
+from bookstore import db, orders
 
 app = Flask(__name__)
 conn = db.connect()
@@ -40,3 +40,18 @@ def sales():
 def export():
     reports.export_csv(request.args.get("file", "books.csv"))
     return jsonify({"status": "exported"})
+
+orders.create_orders_table(conn)
+
+
+@app.post("/orders")
+def new_order():
+    data = request.get_json()
+    order_id = orders.place_order(conn, data["customer"], data["book_id"], data["quantity"])
+    orders.charge_customer(data["customer"], data["amount"])
+    return jsonify({"id": order_id, "token": orders.order_token(order_id)}), 201
+
+
+@app.get("/orders/<customer>")
+def customer_orders(customer: str):
+    return jsonify(orders.orders_for_customer(conn, customer))
