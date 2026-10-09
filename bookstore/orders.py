@@ -1,4 +1,4 @@
-ximport os
+import os
 import hashlib
 import sqlite3
 
